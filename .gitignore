@@ -1,10 +1,25 @@
+# Only the site and its public docs belong in the repo:
+# index.html, README.md, docs/, tools/ and the Pages workflow.
+
+# AI assistant and editor tooling (kept locally, never pushed)
 CLAUDE.md
+.claude/
+.mcp.json
+.playwright-mcp/
+skills-lock.json
+.vscode/
+.idea/
+
+# OS clutter
 .DS_Store
+Thumbs.db
+
+# Secrets
 .env*
 *.pem
 *.key
+
+# Dependencies and scratch output
 node_modules/
-.claude/settings.local.json
-.playwright-mcp/
-.claude/skills/
-skills-lock.json
+__pycache__/
+*.log
