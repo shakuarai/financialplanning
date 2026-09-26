@@ -1,7 +1,7 @@
 ---
 description: Security-scan the project, push it to GitHub, update the README and repo About, and deploy GitHub Pages via Actions
 argument-hint: "[owner/repo] [public|private] [commit message]"
-allowed-tools: Bash(git:*), Bash(gh:*), Bash(grep:*), Bash(find:*), Bash(ls:*), Bash(cat:*), Bash(du:*), Bash(file:*), Bash(python3:*), Bash(osascript:*), Bash(curl:*), Bash(mkdir:*), Bash(gitleaks:*), Bash(trufflehog:*), Read, Write, Edit
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(grep:*), Bash(find:*), Bash(ls:*), Bash(cat:*), Bash(du:*), Bash(file:*), Bash(python3:*), Bash(osascript:*), Bash(curl:*), Bash(mkdir:*), Bash(gitleaks:*), Bash(trufflehog:*), Bash(pkill:*), Bash(rm:*), Read, Write, Edit, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_wait_for, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_console_messages, mcp__playwright__browser_close
 ---
 
 Publish this project to GitHub and host it on GitHub Pages.
@@ -56,6 +56,20 @@ Create `README.md` if missing, otherwise update it in place, preserving what's s
 - A note that contact details, avatars and social links are placeholders.
 
 Base the content on `index.html`, `CLAUDE.md` and `WealthPlanning` where present. Don't invent features.
+
+### 2a. Screenshot
+
+Refresh `docs/screenshot.png` with the Playwright MCP tools (`mcp__playwright__*`, configured in `.mcp.json`) so the README shows the current page. If those tools aren't available (server not approved, or Node/`npx` missing), say so, keep the existing screenshot and carry on.
+
+1. Serve the folder locally: `python3 -m http.server 8765` (run in the background). Playwright may block `file://` URLs.
+2. `browser_resize` to 1280×800, then `browser_navigate` to `http://localhost:8765/index.html`.
+3. `browser_wait_for` 3 seconds so the hero counters and fade-ins finish.
+4. Check `browser_console_messages`. A 404 for `favicon.ico` is expected; report any other errors.
+5. `browser_take_screenshot` of the viewport (not full page) with `scale: "css"` and `filename: "docs/screenshot.png"`. Read the image back and confirm it shows the hero rendered (not blank, no half-finished animations or missing hero photo).
+6. `browser_close`, stop the server (`pkill -f "http.server 8765"`) and delete `.playwright-mcp/` (it's also in `.gitignore`).
+7. Make sure the README embeds it just under the **Live site** line: `![Horizon Wealth Planning home page at desktop width](docs/screenshot.png)`.
+
+The screenshot is committed with the rest of the changes in step 4. Step 1's scan must cover it as well, so take it before the scan, or re-run the large-file check on it (it should be well under 5 MB). The Pages workflow publishes only `index.html`, so `docs/` isn't served.
 
 ## 3. GitHub Pages workflow
 

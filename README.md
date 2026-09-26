@@ -4,6 +4,8 @@ A one-page marketing site for **Horizon Wealth Planning**, a demo financial plan
 
 **Live site:** https://shakuarai.github.io/financialplanning/
 
+![Horizon Wealth Planning home page at desktop width](docs/screenshot.png)
+
 The whole site lives in [`index.html`](index.html): the HTML, the CSS in a `<style>` tag and plain JavaScript in a `<script>` tag. It uses no frameworks, build tools or external JS or CSS libraries.
 
 ## What's on the page
