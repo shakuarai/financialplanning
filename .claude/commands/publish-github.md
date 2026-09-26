@@ -1,7 +1,7 @@
 ---
 description: Security-scan the project, push it to GitHub, update the README and repo About, and deploy GitHub Pages via Actions
 argument-hint: "[owner/repo] [public|private] [commit message]"
-allowed-tools: Bash(git:*), Bash(gh:*), Bash(grep:*), Bash(find:*), Bash(ls:*), Bash(cat:*), Bash(du:*), Bash(file:*), Bash(python3:*), Bash(osascript:*), Bash(curl:*), Bash(mkdir:*), Bash(gitleaks:*), Bash(trufflehog:*), Bash(pkill:*), Bash(rm:*), Read, Write, Edit, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_wait_for, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_console_messages, mcp__playwright__browser_close
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(grep:*), Bash(find:*), Bash(ls:*), Bash(cat:*), Bash(du:*), Bash(file:*), Bash(python3:*), Bash(osascript:*), Bash(node:*), Bash(curl:*), Bash(mkdir:*), Bash(gitleaks:*), Bash(trufflehog:*), Bash(pkill:*), Bash(rm:*), Read, Write, Edit, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_wait_for, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_console_messages, mcp__playwright__browser_close
 ---
 
 Publish this project to GitHub and host it on GitHub Pages.
@@ -35,11 +35,12 @@ Checks:
 4. **Personal data**: real-looking email addresses, phone numbers and street addresses. The ones documented as placeholders in the README / `WealthPlanning` §6 are fine; flag anything else, including the user's own email if it appears.
 5. **Large files**: anything over 5 MB (`find . -path ./.git -prune -o -type f -size +5M -print`).
 6. **Site-specific checks for `index.html`**:
-   - External `<script src>` or stylesheet `<link>` (the brief allows none) and any `http://` (non-HTTPS) resource URLs.
+   - External `<script src>` or stylesheet `<link>` (the brief allows none, apart from the Google Fonts stylesheet) and any `http://` (non-HTTPS) resource URLs.
    - Forms must not post to a real endpoint (both forms are demo-only and should just `console.log`).
-   - User input must be inserted with `textContent`; flag any new `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write` or `eval` that touches user input.
+   - The JS must not use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write` or `eval` at all (the CSP enforces Trusted Types), and user input must be inserted with `textContent`.
    - External links with `target="_blank"` should have `rel="noopener"` (or `noreferrer`).
-   - Syntax-check the embedded JS with the JavaScriptCore command in `CLAUDE.md`.
+   - **CSP**: the `Content-Security-Policy` meta tag must still be present with `default-src 'none'`, and `python3 tools/csp-hashes.py --check` must pass. If it fails, run `python3 tools/csp-hashes.py`, then reload the page and confirm the console shows no CSP violations.
+   - Syntax-check the embedded JS with the `node --check` command in `CLAUDE.md`.
 7. **Workflow check**: any `.github/workflows/*.yml` must use least-privilege `permissions`, must not echo secrets, and must pin actions to a major version from the official `actions/` org.
 
 Report the results as a short table (check, result, details). Then:

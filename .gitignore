@@ -6,3 +6,5 @@ CLAUDE.md
 node_modules/
 .claude/settings.local.json
 .playwright-mcp/
+.claude/skills/
+skills-lock.json
