@@ -2,7 +2,7 @@
 <html lang="en-AU">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nDKcbeVV8te8uAzlRSs7InDtKo8Hb7PsY8rX2CUVenA='; style-src 'sha256-iE7kKkldAvvNOBmnchv7hVahUR0/vrKzGV7hghmOaq8=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UW/W8wGIOEYjqLc4Vc4ArFYcmobjUjHYAPiHqVdiy/s='; style-src 'sha256-+C+lHXv6QfmmqSHoG2Vin6mCsIvA1BwaA9dX6yDjxno=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Financial Planning for Young Professionals in Sydney | Horizon Wealth</title>
@@ -1263,6 +1263,77 @@
     }
 
     /* =========================================================
+       14b. EVENT PROMO (non-modal card shown after 10s on the page)
+       ========================================================= */
+    .promo {
+      position: fixed;
+      left: var(--s-4);
+      right: var(--s-4);
+      bottom: var(--s-4);
+      z-index: 950;
+      padding: var(--s-5);
+      padding-right: var(--s-7);
+      border: 1px solid var(--c-on-dark-muted);
+      border-top: 6px solid var(--c-sun);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow);
+      transition: opacity var(--t) var(--ease);
+    }
+
+    .promo[hidden] { display: none; }
+
+    .promo.is-entering { opacity: 0; }
+
+    .promo__eyebrow {
+      margin: 0 0 var(--s-1);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--c-sun);
+    }
+
+    .promo__title {
+      margin: 0 0 var(--s-2);
+      font-size: var(--fs-md);
+      line-height: 1.25;
+    }
+
+    .promo__details {
+      display: grid;
+      gap: var(--s-1);
+      margin: 0 0 var(--s-4);
+      color: var(--c-on-dark-muted);
+    }
+
+    .promo__details li {
+      display: flex;
+      align-items: center;
+      gap: var(--s-2);
+    }
+
+    .promo__details svg { width: 18px; height: 18px; color: var(--c-sun); }
+
+    .promo__close {
+      position: absolute;
+      top: var(--s-2);
+      right: var(--s-2);
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--c-on-dark);
+      cursor: pointer;
+    }
+
+    .promo__close:hover { background: var(--c-harbour-2); }
+
+    .promo__close svg { width: 22px; height: 22px; }
+
+    /* =========================================================
        15. RESPONSIVE: TABLET (min-width: 768px)
        ========================================================= */
     @media (min-width: 768px) {
@@ -1294,6 +1365,8 @@
       .guide__row .btn { flex-shrink: 0; }
 
       .footer__grid { grid-template-columns: 1.4fr 1fr 1fr; }
+
+      .promo { right: auto; left: var(--s-6); bottom: var(--s-6); max-width: 24rem; }
     }
 
     /* =========================================================
@@ -1937,6 +2010,21 @@
     </div>
   </footer>
 
+  <!-- Event promo: revealed by initPromo() after 10s of visible time, hidden after data-expires -->
+  <aside class="promo on-dark" id="promo" aria-labelledby="promo-title" data-expires="2026-10-01T00:00:00" hidden>
+    <button class="promo__close" type="button" aria-label="Close event announcement">
+      <svg aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
+    </button>
+    <p class="promo__eyebrow">Free lunch talk</p>
+    <h2 class="promo__title" id="promo-title">Retirement planning, explained in an hour</h2>
+    <ul class="promo__details">
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-clock"/></svg>Wednesday 30 September, 1 hour at lunchtime</li>
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-pin"/></svg>Our Bukit Timah premises</li>
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Free, with light refreshments</li>
+    </ul>
+    <a class="btn btn--sun promo__cta" href="#contact">Reserve a seat</a>
+  </aside>
+
   <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">
     <svg aria-hidden="true" focusable="false"><use href="#i-up"/></svg>
   </button>
@@ -2464,7 +2552,65 @@
       }
 
       /* =======================================================
-         7. FOOTER YEAR
+         7. EVENT PROMO: shown after 10s of visible time on the page
+         ======================================================= */
+      function initPromo() {
+        const promo = document.getElementById("promo");
+        const DELAY = 10000;
+        const KEY = "promo-dismissed";
+
+        if (Date.now() >= new Date(promo.dataset.expires).getTime()) return;
+        try { if (sessionStorage.getItem(KEY)) return; } catch (e) { /* storage blocked */ }
+
+        // Only count time while the tab is visible
+        let remaining = DELAY;
+        let startedAt = 0;
+        let timer = 0;
+
+        function start() {
+          startedAt = Date.now();
+          timer = setTimeout(show, remaining);
+        }
+        function pause() {
+          clearTimeout(timer);
+          remaining -= Date.now() - startedAt;
+        }
+        function onVisibility() {
+          if (document.hidden) pause(); else start();
+        }
+
+        function show() {
+          document.removeEventListener("visibilitychange", onVisibility);
+          promo.classList.add("is-entering");
+          promo.hidden = false;
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () { promo.classList.remove("is-entering"); });
+          });
+          document.addEventListener("keydown", onKey);
+        }
+
+        // The CTA link moves focus itself, so only the close button and Escape restore it
+        function dismiss(restoreFocus) {
+          const hadFocus = restoreFocus && promo.contains(document.activeElement);
+          promo.hidden = true;
+          document.removeEventListener("keydown", onKey);
+          try { sessionStorage.setItem(KEY, "1"); } catch (e) { /* storage blocked */ }
+          if (hadFocus) document.getElementById("main").focus({ preventScroll: true });
+        }
+
+        function onKey(e) {
+          if (e.key === "Escape" && promo.contains(document.activeElement)) dismiss(true);
+        }
+
+        promo.querySelector(".promo__close").addEventListener("click", function () { dismiss(true); });
+        promo.querySelector(".promo__cta").addEventListener("click", function () { dismiss(false); });
+
+        document.addEventListener("visibilitychange", onVisibility);
+        if (!document.hidden) start();
+      }
+
+      /* =======================================================
+         8. FOOTER YEAR
          ======================================================= */
       function setYear() {
         document.getElementById("year").textContent = new Date().getFullYear();
@@ -2480,6 +2626,7 @@
         initEnquiryForm();
         initGuideForm();
         initBackToTop();
+        initPromo();
         setYear();
       });
     })();

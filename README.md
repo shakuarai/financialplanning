@@ -18,6 +18,7 @@ The whole site lives in [`index.html`](index.html): the HTML, the CSS in a `<sty
 - **Free checklist:** an email-only sign-up for a first-home deposit checklist (the lead magnet).
 - **FAQ:** common first questions, using native `<details>` elements.
 - **Contact:** an enquiry form with validation for every field. Errors are announced to screen readers.
+- **Event promo:** after 10 seconds of visible time on the page, a dismissible card in the bottom corner announces a free lunch talk on retirement planning. Closing it hides it for the rest of the browser session, and it stops appearing after the date in its `data-expires` attribute.
 - **Footer:** page links, contact details, social links and a general advice warning.
 
 ## Accessibility
@@ -60,6 +61,7 @@ open index.html
 - The CSS, HTML and JS are divided by numbered comment banners, such as `/* 9. TESTIMONIALS CAROUSEL */`.
 - Icons are `<symbol>`s in the SVG sprite at the top of `<body>`. Use one with `<svg><use href="#i-name"/></svg>`.
 - The calculator's growth rate and milestone ages are the `data-rate` and `data-milestones` attributes on `#calc`.
+- The event promo's text is in the `#promo` `<aside>` near the end of `<body>`. To run it for a new event, change the text and its `data-expires` date. The 10-second delay is `DELAY` in `initPromo()`.
 
 **After editing the `<style>` or `<script>` block, update the CSP hashes**, or the browser will block the changed block:
 
