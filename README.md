@@ -19,6 +19,7 @@ The whole site lives in [`index.html`](index.html): the HTML, the CSS in a `<sty
 - **FAQ:** common first questions, using native `<details>` elements.
 - **Contact:** an enquiry form with validation for every field. Errors are announced to screen readers.
 - **Event promo:** after 10 seconds of visible time on the page, a dismissible card in the bottom corner announces a free lunch talk on retirement planning. Closing it hides it for the rest of the browser session, and it stops appearing after the date in its `data-expires` attribute.
+- **WhatsApp chat widget:** a friendly robot button in the bottom-right corner opens a small chat panel. Its topic buttons and "Chat on WhatsApp" button open WhatsApp in a new tab with a message already typed. It isn't a live chatbot, and nothing is sent until the visitor presses send in WhatsApp.
 - **Footer:** page links, contact details, social links and a general advice warning.
 
 ## Accessibility
@@ -61,6 +62,7 @@ open index.html
 - The CSS, HTML and JS are divided by numbered comment banners, such as `/* 9. TESTIMONIALS CAROUSEL */`.
 - Icons are `<symbol>`s in the SVG sprite at the top of `<body>`. Use one with `<svg><use href="#i-name"/></svg>`.
 - The calculator's growth rate and milestone ages are the `data-rate` and `data-milestones` attributes on `#calc`.
+- The WhatsApp number is in the `wa.me/6512345678` links inside the `#chat` widget near the end of `<body>`. Change all four links together. The `text=` part of each link is the message that's already typed, URL-encoded.
 - The event promo's text is in the `#promo` `<aside>` near the end of `<body>`. To run it for a new event, change the text and its `data-expires` date. The 10-second delay is `DELAY` in `initPromo()`.
 
 **After editing the `<style>` or `<script>` block, update the CSP hashes**, or the browser will block the changed block:

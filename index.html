@@ -2,7 +2,7 @@
 <html lang="en-AU">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UW/W8wGIOEYjqLc4Vc4ArFYcmobjUjHYAPiHqVdiy/s='; style-src 'sha256-+C+lHXv6QfmmqSHoG2Vin6mCsIvA1BwaA9dX6yDjxno=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mOY0M3jwQaMG/LWN+3J9j3iQuKsvrSzZ5dNKmEUMjMI='; style-src 'sha256-VLvu/tDMg7onRZDxMzcedfCJpJQbkslXwLbjZ9sF/Es=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Financial Planning for Young Professionals in Sydney | Horizon Wealth</title>
@@ -1334,6 +1334,261 @@
     .promo__close svg { width: 22px; height: 22px; }
 
     /* =========================================================
+       14c. WHATSAPP CHAT WIDGET (launcher + small panel, bottom right)
+       ========================================================= */
+    .chat {
+      --c-wa: #25D366;           /* WhatsApp green, used with ink text (9:1) */
+      --c-wa-deep: #1EBE5A;
+      position: fixed;
+      right: var(--s-4);
+      bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+      z-index: 940;
+    }
+
+    .chat__launcher {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      padding: 0;
+      border: 3px solid var(--c-white);
+      border-radius: 50%;
+      background: var(--c-sun);
+      color: var(--c-harbour);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform var(--t) var(--ease), background-color var(--t-fast);
+    }
+
+    .chat__launcher:hover { background: var(--c-sun-deep); transform: translateY(-3px); }
+
+    .chat__launcher svg { width: 40px; height: 40px; transition: transform var(--t) var(--ease); }
+
+    .chat__launcher:hover .chat__icon-bot { transform: rotate(-8deg); }
+
+    .chat__launcher .chat__icon-close { display: none; width: 26px; height: 26px; }
+    .chat__launcher[aria-expanded="true"] .chat__icon-bot { display: none; }
+    .chat__launcher[aria-expanded="true"] .chat__icon-close { display: block; }
+    .chat__launcher[aria-expanded="true"]:hover { transform: none; }
+
+    /* Blink once on hover or focus */
+    .chat__launcher:hover .bot-eyes,
+    .chat__launcher:focus-visible .bot-eyes { animation: bot-blink 0.5s var(--ease); }
+
+    .bot-eyes { transform-box: fill-box; transform-origin: center; }
+
+    @keyframes bot-blink {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.1); }
+    }
+
+    /* Little "online" dot, with a ring so it isn't colour-only */
+    .chat__launcher::after {
+      content: "";
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      width: 14px;
+      height: 14px;
+      border: 3px solid var(--c-white);
+      border-radius: 50%;
+      background: var(--c-wa);
+    }
+    .chat__launcher[aria-expanded="true"]::after { display: none; }
+
+    /* Speech-bubble hint, shown on hover and keyboard focus */
+    .chat__hint {
+      position: absolute;
+      right: calc(100% + var(--s-3));
+      top: 50%;
+      padding: var(--s-2) var(--s-3);
+      border-radius: var(--r-md) var(--r-md) 4px var(--r-md);
+      background: var(--c-white);
+      color: var(--c-ink);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(6px, -50%);
+      transition: opacity var(--t-fast), transform var(--t-fast) var(--ease);
+    }
+
+    .chat__launcher:hover .chat__hint,
+    .chat__launcher:focus-visible .chat__hint {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+    .chat__launcher[aria-expanded="true"] .chat__hint { display: none; }
+
+    .chat__panel {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + var(--s-3));
+      display: flex;
+      flex-direction: column;
+      width: min(21rem, calc(100vw - 2 * var(--s-4)));
+      /* Stay clear of the sticky header; the body scrolls on short screens */
+      max-height: calc(100dvh - var(--nav-h) - 62px - 3 * var(--s-4));
+      overflow: hidden;
+      border-radius: var(--r-lg);
+      background: var(--c-paper);
+      box-shadow: var(--shadow), 0 0 0 1px var(--c-line);
+      transform-origin: bottom right;
+      transition: opacity var(--t) var(--ease), transform var(--t) var(--ease);
+    }
+
+    .chat__panel[hidden] { display: none; }
+
+    .chat__head, .chat__foot { flex-shrink: 0; }
+
+    .chat__panel.is-entering { opacity: 0; transform: translateY(12px) scale(0.9); }
+
+    .chat__head {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      padding: var(--s-3) var(--s-3) var(--s-3) var(--s-4);
+    }
+
+    .chat__avatar {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--c-sun);
+      color: var(--c-harbour);
+    }
+
+    .chat__avatar svg { width: 36px; height: 36px; }
+
+    .chat__title { margin: 0; font-size: var(--fs-base); line-height: 1.2; }
+
+    .chat__status {
+      display: flex;
+      align-items: center;
+      gap: var(--s-2);
+      margin: 2px 0 0;
+      font-size: var(--fs-sm);
+      color: var(--c-on-dark-muted);
+    }
+
+    .chat__status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--c-wa);
+    }
+
+    .chat__close {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-left: auto;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--c-on-dark);
+      cursor: pointer;
+    }
+
+    .chat__close:hover { background: var(--c-harbour-2); }
+
+    .chat__close svg { width: 22px; height: 22px; }
+
+    .chat__body {
+      overflow-y: auto;
+      padding: var(--s-4);
+      background-color: var(--c-sky);
+      background-image: radial-gradient(rgba(14, 59, 67, 0.08) 1px, transparent 1px);
+      background-size: 14px 14px;
+    }
+
+    .chat__bubble {
+      position: relative;
+      max-width: 90%;
+      margin: 0 0 var(--s-2);
+      padding: var(--s-2) var(--s-3);
+      border-radius: 4px var(--r-md) var(--r-md) var(--r-md);
+      background: var(--c-white);
+      color: var(--c-ink);
+      box-shadow: 0 1px 2px rgba(6, 30, 34, 0.12);
+    }
+
+    .chat__bubble + .chat__bubble { border-radius: var(--r-md); }
+
+    .chat__prompt {
+      margin: var(--s-3) 0 var(--s-2);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      color: var(--c-muted);
+    }
+
+    .chat__chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .chat__chips a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: var(--s-1) var(--s-3);
+      border: 1.5px solid var(--c-harbour);
+      border-radius: 999px;
+      background: var(--c-white);
+      color: var(--c-harbour);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color var(--t-fast), color var(--t-fast);
+    }
+
+    .chat__chips a:hover { background: var(--c-harbour); color: var(--c-on-dark); }
+
+    .chat__foot { padding: var(--s-3) var(--s-4); }
+
+    .chat__wa {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s-2);
+      width: 100%;
+      min-height: 48px;
+      padding: var(--s-3) var(--s-4);
+      border-radius: 999px;
+      background: var(--c-wa);
+      color: var(--c-ink);
+      font-weight: 700;
+      text-decoration: none;
+      transition: background-color var(--t-fast);
+    }
+
+    .chat__wa:hover { background: var(--c-wa-deep); }
+
+    .chat__wa svg { width: 22px; height: 22px; }
+
+    .chat__note {
+      margin: var(--s-2) 0 0;
+      font-size: 0.75rem;
+      text-align: center;
+      color: var(--c-muted);
+    }
+
+    /* The back-to-top button sits above the chat launcher */
+    .back-to-top { bottom: calc(var(--s-4) + 62px + var(--s-3) + env(safe-area-inset-bottom, 0px)); right: calc(var(--s-4) + 7px); }
+
+    /* =========================================================
        15. RESPONSIVE: TABLET (min-width: 768px)
        ========================================================= */
     @media (min-width: 768px) {
@@ -1367,6 +1622,10 @@
       .footer__grid { grid-template-columns: 1.4fr 1fr 1fr; }
 
       .promo { right: auto; left: var(--s-6); bottom: var(--s-6); max-width: 24rem; }
+
+      .chat { right: var(--s-6); bottom: calc(var(--s-6) + env(safe-area-inset-bottom, 0px)); }
+
+      .back-to-top { right: calc(var(--s-6) + 7px); bottom: calc(var(--s-6) + 62px + var(--s-3) + env(safe-area-inset-bottom, 0px)); }
     }
 
     /* =========================================================
@@ -1496,6 +1755,20 @@
     <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></symbol>
     <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M14 8h3V4h-3c-2.76 0-5 2.24-5 5v2H7v4h2v9h4v-9h3l1-4h-4V9c0-.55.45-1 1-1z" fill="currentColor"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64z" fill="currentColor"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 40 40">
+      <line x1="20" y1="4" x2="20" y2="9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="20" cy="4" r="2.4" fill="currentColor"/>
+      <rect x="7" y="9" width="26" height="22" rx="10" fill="#FFFFFF" stroke="currentColor" stroke-width="2.2"/>
+      <g class="bot-eyes">
+        <ellipse cx="15" cy="18" rx="2.2" ry="2.8" fill="currentColor"/>
+        <ellipse cx="25" cy="18" rx="2.2" ry="2.8" fill="currentColor"/>
+      </g>
+      <circle cx="11.5" cy="23" r="2" fill="#F59E8B" opacity="0.8"/>
+      <circle cx="28.5" cy="23" r="2" fill="#F59E8B" opacity="0.8"/>
+      <path d="M17 23.5q3 2.6 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M14 31l-2 5 6-5" fill="#FFFFFF" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.31l-.34-.2-3.57.93.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.23-9.43 9.44-9.43a9.37 9.37 0 0 1 6.67 2.77 9.37 9.37 0 0 1 2.76 6.67c0 5.2-4.24 9.43-9.44 9.43zm8.03-17.46A11.3 11.3 0 0 0 12.05.72C5.8.72.7 5.8.7 12.07c0 2 .52 3.95 1.52 5.67L.6 23.64l6.03-1.58a11.3 11.3 0 0 0 5.42 1.38h.01c6.25 0 11.34-5.09 11.35-11.35 0-3.03-1.18-5.88-3.33-8.03z" fill="currentColor"/></symbol>
   </svg>
 
   <!-- Templates cloned by the JS (keeps markup out of script strings) -->
@@ -2024,6 +2297,56 @@
     </ul>
     <a class="btn btn--sun promo__cta" href="#contact">Reserve a seat</a>
   </aside>
+
+  <!-- WhatsApp chat widget: the launcher toggles a small non-modal panel (initChat). Number: +65 1234 5678 -->
+  <div class="chat" id="chat">
+    <div class="chat__panel" id="chat-panel" role="dialog" aria-labelledby="chat-title" hidden>
+      <div class="chat__head on-dark">
+        <span class="chat__avatar"><svg aria-hidden="true" focusable="false"><use href="#i-bot"/></svg></span>
+        <div>
+          <h2 class="chat__title" id="chat-title">Hori from Horizon</h2>
+          <p class="chat__status">Online &middot; replies same day</p>
+        </div>
+        <button class="chat__close" type="button" aria-label="Close chat">
+          <svg aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="chat__body">
+        <p class="chat__bubble">Hi there! <span aria-hidden="true">👋</span></p>
+        <p class="chat__bubble">Got a money question? Message a planner on WhatsApp. No forms, no pressure.</p>
+        <p class="chat__prompt" id="chat-prompt">Pick a topic to start:</p>
+        <ul class="chat__chips" aria-labelledby="chat-prompt">
+          <li><a href="https://wa.me/6512345678?text=Hi%20Horizon%2C%20I%27d%20like%20to%20book%20a%20free%20chat." target="_blank" rel="noopener noreferrer">Book a free chat</a></li>
+          <li><a href="https://wa.me/6512345678?text=Hi%20Horizon%2C%20I%27m%20saving%20for%20my%20first%20home." target="_blank" rel="noopener noreferrer">Saving for a home</a></li>
+          <li><a href="https://wa.me/6512345678?text=Hi%20Horizon%2C%20I%27d%20like%20to%20start%20investing." target="_blank" rel="noopener noreferrer">Starting to invest</a></li>
+        </ul>
+      </div>
+      <div class="chat__foot">
+        <a class="chat__wa" href="https://wa.me/6512345678?text=Hi%20Horizon%2C%20I%20have%20a%20question." target="_blank" rel="noopener noreferrer">
+          <svg aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg>
+          Chat on WhatsApp<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+        <p class="chat__note">Opens WhatsApp. Please don't share account numbers or passwords.</p>
+      </div>
+    </div>
+    <button class="chat__launcher" id="chat-launcher" type="button" aria-expanded="false" aria-controls="chat-panel" aria-label="Chat with us on WhatsApp">
+      <svg class="chat__icon-bot" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <line x1="20" y1="4" x2="20" y2="9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="20" cy="4" r="2.4" fill="currentColor"/>
+          <rect x="7" y="9" width="26" height="22" rx="10" fill="#FFFFFF" stroke="currentColor" stroke-width="2.2"/>
+          <g class="bot-eyes">
+            <ellipse cx="15" cy="18" rx="2.2" ry="2.8" fill="currentColor"/>
+            <ellipse cx="25" cy="18" rx="2.2" ry="2.8" fill="currentColor"/>
+          </g>
+          <circle cx="11.5" cy="23" r="2" fill="#F59E8B" opacity="0.8"/>
+          <circle cx="28.5" cy="23" r="2" fill="#F59E8B" opacity="0.8"/>
+          <path d="M17 23.5q3 2.6 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 31l-2 5 6-5" fill="#FFFFFF" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      </svg>
+      <svg class="chat__icon-close" aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
+      <span class="chat__hint" aria-hidden="true">Questions? Chat with us!</span>
+    </button>
+  </div>
 
   <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">
     <svg aria-hidden="true" focusable="false"><use href="#i-up"/></svg>
@@ -2610,7 +2933,55 @@
       }
 
       /* =======================================================
-         8. FOOTER YEAR
+         8. WHATSAPP CHAT WIDGET: launcher toggles a non-modal panel
+         ======================================================= */
+      function initChat() {
+        const root = document.getElementById("chat");
+        const launcher = document.getElementById("chat-launcher");
+        const panel = document.getElementById("chat-panel");
+
+        function open() {
+          panel.classList.add("is-entering");
+          panel.hidden = false;
+          launcher.setAttribute("aria-expanded", "true");
+          launcher.setAttribute("aria-label", "Close chat");
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () { panel.classList.remove("is-entering"); });
+          });
+          panel.querySelector(".chat__wa").focus({ preventScroll: true });
+          document.addEventListener("keydown", onKey);
+          document.addEventListener("click", onOutside);
+        }
+
+        function close(restoreFocus) {
+          const hadFocus = restoreFocus && root.contains(document.activeElement);
+          panel.hidden = true;
+          launcher.setAttribute("aria-expanded", "false");
+          launcher.setAttribute("aria-label", "Chat with us on WhatsApp");
+          document.removeEventListener("keydown", onKey);
+          document.removeEventListener("click", onOutside);
+          if (hadFocus) launcher.focus({ preventScroll: true });
+        }
+
+        function onKey(e) {
+          if (e.key === "Escape") close(true);
+        }
+        function onOutside(e) {
+          if (!root.contains(e.target)) close(false);
+        }
+
+        launcher.addEventListener("click", function () {
+          if (panel.hidden) open(); else close(true);
+        });
+        panel.querySelector(".chat__close").addEventListener("click", function () { close(true); });
+        // Tidy the panel away once they head off to WhatsApp
+        panel.querySelectorAll("a").forEach(function (a) {
+          a.addEventListener("click", function () { close(false); });
+        });
+      }
+
+      /* =======================================================
+         9. FOOTER YEAR
          ======================================================= */
       function setYear() {
         document.getElementById("year").textContent = new Date().getFullYear();
@@ -2627,6 +2998,7 @@
         initGuideForm();
         initBackToTop();
         initPromo();
+        initChat();
         setYear();
       });
     })();
